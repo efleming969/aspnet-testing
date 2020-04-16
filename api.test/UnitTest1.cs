@@ -19,16 +19,15 @@ namespace api.test
 
             var server = new TestServer(webHostBuilder);
             var client = server.CreateClient();
-            var requestObject = new {Name = "123456"};
-            var response = client.PostAsync("simple",
-                new StringContent(JsonConvert.SerializeObject(requestObject), Encoding.UTF8, "application/json"));
+            var stringContent = new StringContent(JsonConvert.SerializeObject(new {Name = "123456"}), Encoding.UTF8,
+                "application/json");
 
+            var response = client.PostAsync("simple", stringContent);
             var result = response.Result;
-
-            Assert.False(result.IsSuccessStatusCode);
             var content = result.Content.ReadAsStringAsync().Result;
 
-            Assert.NotNull(content);
+            Assert.False(result.IsSuccessStatusCode);
+            Assert.Equal(@"{""Name"":[""much too long""]}", content);
         }
     }
 }
